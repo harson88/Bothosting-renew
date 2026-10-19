@@ -390,11 +390,11 @@ def main():
             current_title = sb.get_title()
             print(f"📝 当前URL: {current_url}, Title: {current_title}")
 
-            if current_url == "https://bot-hosting.net/a/billings":
+            if "/a/billings" in current_url and "/login" not in current_url and "error=" not in current_url:
                 login_ok = True
-                print("✅ SESSION_TOKEN 登录成功,当前已到达账单页")
+                print("✅ SESSION_TOKEN 登录成功, 当前已到达账单页")
             else:
-                print(f"❌ SESSION_TOKEN 登录失败，当前标题: {current_title}")
+                print(f"❌ SESSION_TOKEN 登录失败，当前URL: {current_url}, 当前标题: {current_title}")
 
         # 方式2: Discord OAuth 登录（备用）
         if not login_ok and DC_TOKEN:
@@ -409,7 +409,7 @@ def main():
                 current_title = sb.get_title()
                 print(f"📝 当前URL: {current_url}, Title: {current_title}")
 
-                if current_url == "https://bot-hosting.net/a/billings":
+                if "a/billings" in current_url:
                     login_ok = True
                     print("✅ Discord OAuth 登录成功,当前已到达账单页")
                 else:
@@ -504,7 +504,8 @@ def main():
 
             modal_button_clicked = False
             try:
-                sb.click('button:contains("Renew for 4 days")', timeout=8)
+                selector = 'div[role="dialog"] button.btn-primary' 
+                sb.click(selector, timeout=8)
                 modal_button_clicked = True
                 print("✅ 已点击续期按钮")
             except Exception as e:
@@ -516,7 +517,7 @@ def main():
             # 提取新的到期日期和倒计时
             new_page_text = sb.get_page_source()
             new_expiry = extract_expiry_date(new_page_text)
-            new_match = re.search(r"Renew in (\d{2}:\d{2}:\d{2})", new_page_text)
+            new_match = re.search(r"Renewal cooldown (\d{2}:\d{2}:\d{2})", new_page_text)
             if new_match:
                 new_countdown = new_match.group(1)
                 print(f"✅ 续期成功！新的倒计时: {new_countdown}")
